@@ -3,43 +3,54 @@
 import { useEffect, useState } from "react";
 
 export default function Home() {
-  const [toDoList, setToDoList] = useState<string[]>([]);
+  const [toDoList, setToDoList] = useState<{[key: string] : string}>({});
   const [inputValue, setInputValue] = useState('');
+  const [index, setIndex] = useState<number>(0);
 
-  const handleDone = (id: Number) => {
+  const handleDone = (id: string) => {
     console.log(id);
-    const newList = toDoList.filter(ele => toDoList.indexOf(ele) !== id);
-    setToDoList(newList);
+
+    const updateList = Object.fromEntries(Object.entries(toDoList).filter(([key]) => key !== id));
+
+    setToDoList(updateList);
   }
 
   const handleAdd = (listEle: string) => {
-    setToDoList(prev => [...prev, listEle]);
+    setToDoList(prev => ({...prev, [index]: listEle}));
+    setIndex(prevIndex => prevIndex+1);
     setInputValue('');
   }
 
   const listall = () => {
-    return toDoList.map(toDo => (
+    // console.log(toDoList);
+    const ele = [];
+    for(const index in toDoList) {
+      ele.push(
       <div
+      key={index}
         className="flex items-center justify-between max-w-3xl bg-white p-4 rounded-lg shadow-md mb-3 hover:bg-gray-50 transition duration-200"
       >
-        <span className="text-lg">{toDo}</span>
+        <span className="text-lg">{toDoList[index]}</span>
         <button
-          onClick={() => handleDone(toDoList.indexOf(toDo))}
+          onClick={() => handleDone(index)}
           className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition duration-200"
         >
           Done
         </button>
       </div>
-    ));
+      )
+    }
+    return ele;
   };
 
-  const handleKeyDown = (e) => {
+  const handleKeyDown = (e: any) => {
     if(e.key === 'Enter') {
       handleAdd(inputValue)
     }
   }
 
   useEffect(() => {
+    console.log('re-render');
     listall()
   }, [toDoList])
 
