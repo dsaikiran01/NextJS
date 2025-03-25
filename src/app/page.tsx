@@ -1,11 +1,13 @@
 'use client'
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 export default function Home() {
-  const [toDoList, setToDoList] = useState<{[key: string] : string}>({});
+  const [toDoList, setToDoList] = useState<{ [key: string]: string }>({});
   const [inputValue, setInputValue] = useState('');
+  const [editValue, setEditValue] = useState('');
   const [index, setIndex] = useState<number>(0);
+  const [editingIndex, setEditingIndex] = useState<string | null>(null);
 
   const handleDone = (id: string) => {
     console.log(id);
@@ -15,37 +17,77 @@ export default function Home() {
     setToDoList(updateList);
   }
 
-  const handleAdd = (listEle: string) => {
-    setToDoList(prev => ({...prev, [index]: listEle}));
-    setIndex(prevIndex => prevIndex+1);
-    setInputValue('');
+  const handleAdd = () => {
+    if (editingIndex === null) {
+      setToDoList(prev => ({ ...prev, [index]: inputValue }));
+      setIndex(prevIndex => prevIndex + 1);
+      setInputValue('');
+    } else {
+      setToDoList(prev => ({ ...prev, [editingIndex]: editValue }));
+      setEditingIndex(null);
+    }
+  }
+
+  const editEvent = (index: string) => {
+    setEditingIndex(index);
+    setEditValue(toDoList[index]);
   }
 
   const listall = () => {
     // console.log(toDoList);
     const ele = [];
-    for(const index in toDoList) {
+    for (const index in toDoList) {
       ele.push(
-      <div
-      key={index}
-        className="flex items-center justify-between max-w-3xl bg-white p-4 rounded-lg shadow-md mb-3 hover:bg-gray-50 transition duration-200"
-      >
-        <span className="text-lg">{toDoList[index]}</span>
-        <button
-          onClick={() => handleDone(index)}
-          className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition duration-200"
+        <div
+          key={index}
+          className="flex items-center justify-between max-w-3xl bg-white p-4 rounded-lg shadow-md mb-3 hover:bg-gray-50 transition duration-200"
         >
-          Done
-        </button>
-      </div>
+          <input
+            className="text-lg"
+            value={editingIndex === index ? editValue : toDoList[index]}
+            onChange={e => setEditValue(e.target.value)}
+            disabled={editingIndex !== index}
+
+          />
+          <div
+            className="flex flex-col gap-1"
+          >
+            {editingIndex === index ? (
+              <button
+                onClick={handleAdd}
+                className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition duration-200"
+              >
+                Save
+              </button>
+            ) :
+              (
+                <button
+                  onClick={() => editEvent(index)}
+                  className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition duration-200"
+                >
+                  Edit
+                </button>
+              )}
+            <button
+              onClick={() => handleDone(index)}
+              className={
+                editingIndex !== index ?
+                  "bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition duration-200" :
+                  "bg-gray-500 text-gray-400 px-4 py-2 rounded-md"}
+              disabled={editingIndex === index}
+            >
+              Done
+            </button>
+          </div>
+        </div>
       )
     }
     return ele;
   };
 
   const handleKeyDown = (e: any) => {
-    if(e.key === 'Enter') {
-      handleAdd(inputValue)
+    if (e.key === 'Enter') {
+      handleAdd()
     }
   }
 
@@ -72,7 +114,7 @@ export default function Home() {
           />
           <button
             className="w-full md:w-auto bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition duration-200"
-            onClick={() => handleAdd(inputValue)}
+            onClick={() => handleAdd()}
           >
             Add
           </button>
