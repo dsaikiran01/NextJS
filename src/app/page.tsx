@@ -1,5 +1,7 @@
 "use client"
 import { useEffect, useState } from "react";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCopy, faCheck, faRotateRight } from '@fortawesome/free-solid-svg-icons';
 
 const smallLetters = 'abcdefghijklmnopqrstuvwxyz';
 const capitalLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -8,12 +10,13 @@ const specialChars = '@#$%^&*()_-+=/~';
 
 export default function Home() {
   const [pswd, setPswd] = useState<string>('');
-  // const [isSmallLetter, setIsSmallLetter] = useState<boolean>(true);
   const [isCapitalLetter, setIsCapitalLetter] = useState<boolean>(true);
   const [isDigit, setIsDigit] = useState<boolean>(false);
   const [isSpecialChar, setIsSpecialChar] = useState<boolean>(false);
 
   const [pswdLen, setPswdLen] = useState<number>(16);
+
+  const [copyIcon, setCopyIcon] = useState(faCopy);
 
   const generatePswd = () => {
     let dict = smallLetters;
@@ -33,10 +36,15 @@ export default function Home() {
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(pswd)
+    setCopyIcon(faCheck);
+    setTimeout(() => {
+      setCopyIcon(faCopy);
+    }, 2000);
   }
 
   useEffect(() => {
     generatePswd();
+    console.log(pswdLen);
   }, [pswdLen, isCapitalLetter, isDigit, isSpecialChar]);
 
   return (
@@ -59,11 +67,21 @@ export default function Home() {
           <button
             className="relative inline-flex items-center justify-center px-6 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition duration-300"
             onClick={copyToClipboard}
-          >Copy</button>
+          >
+            <span
+              id="buttonText"
+              className="absolute transition-all duration-300 text-xl"
+            >
+              {/* <i className="copy-icon fas fa-copy"></i> */}
+              <FontAwesomeIcon icon={copyIcon} className="text-xl" />
+            </span>
+          </button>
           <button
             className="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600 transition duration-300"
             onClick={generatePswd}
-          >Load</button>
+          >
+            <FontAwesomeIcon icon={faRotateRight} className="text-xl" />
+          </button>
         </div>
       </div>
 
@@ -71,6 +89,7 @@ export default function Home() {
       <div className="flex flex-col items-center mt-6 space-y-4 w-full max-w-md">
         <div className="flex justify-between w-full px-6">
           <span className="text-lg font-semibold text-gray-700">12</span>
+          <input className="text-lg font-bold text-gray-700 text-center w-12 border-2 border-gray-300" value={pswdLen} readOnly />
           <span className="text-lg font-semibold text-gray-700">72</span>
         </div>
         <input
@@ -86,18 +105,17 @@ export default function Home() {
       </div>
 
       <div className="mt-6 w-full max-w-lg">
-        <ul className="flex flex-col sm:flex-row justify-around w-full space-y-4 sm:space-y-0 sm:space-x-4">
-          <li className="flex items-center space-x-2">
+        <ul className="flex flex-col items-center sm:flex-row justify-center w-full space-y-4 sm:space-y-0 sm:space-x-12">
+          <li className="flex items-center space-x-4">
             <input
               className="h-5 w-5 text-blue-500"
               type="checkbox"
               checked
-              // onClick={() => setIsSmallLetter(prev => !prev)}
               name="small-letters"
             />
             <label className="text-gray-700" htmlFor="small-letters">abc</label>
           </li>
-          <li className="flex items-center space-x-2">
+          <li className="flex items-center space-x-4">
             <input
               className="h-5 w-5 text-blue-500"
               type="checkbox"
@@ -107,7 +125,7 @@ export default function Home() {
             />
             <label className="text-gray-700" htmlFor="capital-letters">ABC</label>
           </li>
-          <li className="flex items-center space-x-2">
+          <li className="flex items-center space-x-4">
             <input
               className="h-5 w-5 text-blue-500"
               type="checkbox"
@@ -116,7 +134,7 @@ export default function Home() {
             />
             <label className="text-gray-700" htmlFor="digits">012</label>
           </li>
-          <li className="flex items-center space-x-2">
+          <li className="flex items-center space-x-4">
             <input
               className="h-5 w-5 text-blue-500"
               type="checkbox"
@@ -126,6 +144,7 @@ export default function Home() {
             <label className="text-gray-700" htmlFor="special-characters">$@&</label>
           </li>
         </ul>
+
       </div>
     </div>
   );
