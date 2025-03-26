@@ -13,6 +13,7 @@ export default function Home() {
   const [isCapitalLetter, setIsCapitalLetter] = useState<boolean>(true);
   const [isDigit, setIsDigit] = useState<boolean>(false);
   const [isSpecialChar, setIsSpecialChar] = useState<boolean>(false);
+  const [pswdStrength, setPswdStrength] = useState('');
 
   const [pswdLen, setPswdLen] = useState<number>(16);
 
@@ -32,7 +33,30 @@ export default function Home() {
     }
 
     setPswd(pswdStr);
+    checkPswdStrength();
   }
+
+  const checkPswdStrength = () => {
+    if (pswdLen >= 20 && isCapitalLetter && isDigit && isSpecialChar) {
+      setPswdStrength('very strong');
+    } else if (pswdLen >= 16 && pswdLen < 20 && isCapitalLetter && (isDigit || isSpecialChar)) {
+      setPswdStrength('strong');
+    } else if (pswdLen >= 12 && (isCapitalLetter || isDigit || isSpecialChar)) {
+      setPswdStrength('medium');
+    } else if (pswdLen >= 8 && (isCapitalLetter || isDigit || isSpecialChar)) {
+      setPswdStrength('weak');
+    } else if (pswdLen > 40) {
+      setPswdStrength('very strong');
+    } else if (pswdLen > 30) {
+      setPswdStrength('strong');
+    } else if (pswdLen > 20) {
+      setPswdStrength('medium');
+    } else if (pswdLen > 10) {
+      setPswdStrength('weak');
+    } else {
+      setPswdStrength('very weak');
+    }
+  };
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(pswd)
@@ -57,12 +81,29 @@ export default function Home() {
 
       {/* Password Display Section */}
       <div className="flex flex-col sm:flex-row items-center justify-between w-full max-w-2xl bg-white p-6 rounded-lg shadow-lg">
-        <input
-          className="text-center w-full sm:w-2/3 p-3 border-2 border-gray-300 rounded-md bg-gray-50 text-gray-600 font-medium"
-          value={pswd}
-          id="password"
-          disabled
-        />
+        <div className="relative w-full sm:w-2/3">
+          <input
+            className="text-center w-full p-3 border-2 border-gray-300 rounded-md bg-gray-50 text-gray-600 font-medium"
+            value={pswd}
+            id="password"
+            disabled
+          />
+          <span
+            className={`absolute right-2 top-1/2 transform -translate-y-1/2 px-3 py-1 text-sm font-semibold rounded-full ${pswdStrength === 'very strong'
+              ? 'bg-green-500 text-white'
+              : pswdStrength === 'strong'
+                ? 'bg-yellow-400 text-white'
+                : pswdStrength === 'medium'
+                  ? 'bg-yellow-500 text-white'
+                  : pswdStrength === 'weak'
+                    ? 'bg-red-400 text-white'
+                    : 'bg-gray-300 text-black'
+              }`}
+          >
+            {pswdStrength}
+          </span>
+        </div>
+
         <div className="flex space-x-4 mt-4 sm:mt-0">
           <button
             className="relative inline-flex items-center justify-center px-6 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition duration-300"
@@ -72,7 +113,6 @@ export default function Home() {
               id="buttonText"
               className="absolute transition-all duration-300 text-xl"
             >
-              {/* <i className="copy-icon fas fa-copy"></i> */}
               <FontAwesomeIcon icon={copyIcon} className="text-xl" />
             </span>
           </button>
@@ -88,7 +128,7 @@ export default function Home() {
       {/* Range and Length Section */}
       <div className="flex flex-col items-center mt-6 space-y-4 w-full max-w-md">
         <div className="flex justify-between w-full px-6">
-          <span className="text-lg font-semibold text-gray-700">12</span>
+          <span className="text-lg font-semibold text-gray-700">8</span>
           <input className="text-lg font-bold text-gray-700 text-center w-12 border-2 border-gray-300" value={pswdLen} readOnly />
           <span className="text-lg font-semibold text-gray-700">72</span>
         </div>
@@ -97,7 +137,7 @@ export default function Home() {
           type="range"
           id="characterCount"
           value={pswdLen}
-          min={12}
+          min={8}
           max={72}
           step={1}
           onChange={(e) => setPswdLen(Number(e.target.value))}
