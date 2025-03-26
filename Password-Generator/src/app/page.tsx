@@ -151,6 +151,7 @@ export default function Home() {
               className="h-5 w-5 text-blue-500"
               type="checkbox"
               checked
+              readOnly
               name="small-letters"
             />
             <label className="text-gray-700" htmlFor="small-letters">abc</label>

@@ -10,7 +10,7 @@ export default function Home() {
   const [editingIndex, setEditingIndex] = useState<string | null>(null);
 
   const handleDone = (id: string) => {
-    console.log(id);
+    // console.log(id);
 
     const updateList = Object.fromEntries(Object.entries(toDoList).filter(([key]) => key !== id));
 
